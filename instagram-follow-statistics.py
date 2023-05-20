@@ -33,36 +33,94 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from getpass import getpass
+import csv
+from selenium.common.exceptions import NoSuchElementException
 
 # fill the variables below with your instagram login credentials and run
-your_username = str(input("Enter your username: "))
-your_password = str(getpass("Enter your password (hidden): "))
+
+print("Loading...")
 print()
+
+logged_in = False
 
 # OPENS BROWSER
 browser = webdriver.Firefox()  # uses FireFox browser
 browser.implicitly_wait(5)
-browser.get("https://www.instagram.com/")  # opens instagram in browser
+login_url = "https://www.instagram.com/"
+browser.get(login_url)  # opens instagram in browser
 
-print("Logging into " + your_username + "...")
 
-# LOGS INTO INSTAGRAM
-sleep(1)
-username_input = browser.find_element(By.NAME, "username")
-password_input = browser.find_element(By.NAME, "password")
-username_input.send_keys(your_username)
-password_input.send_keys(your_password)
-sleep(1)
+def collect_user_login():
+    valid_creds = False
+    while valid_creds == False:
+        print("Please login")
+        your_username = str(input("Enter your username: "))
+        your_password = str(getpass("Enter your password (hidden): "))
+        if len(your_password) < 6:
+            print(
+                "Invalid password. Correct length of password is 6 characters or more."
+            )
+        else:
+            valid_creds = True
+        print()
+    return your_username, your_password
 
-login_button = browser.find_element(By.CSS_SELECTOR, "._acap")
-login_button.click()
-sleep(5)
-print("...logged in")
+
+def login_to_website(input_username, input_password):
+    print("Logging into " + input_username + "...")
+
+    username_element = browser.find_element(By.NAME, "username")
+    password_element = browser.find_element(By.NAME, "password")
+    if username_element and password_element:  # checks if the text boxes exist
+        username_element.clear()
+        password_element.clear()
+        username_element.send_keys(input_username)
+        password_element.send_keys(input_password)
+    else:
+        print(
+            "Issue with username and password elements on instagram.",
+            "Sending issue to the developer to get a fix on this issue.",
+        )
+    sleep(0.5)
+    login_button = browser.find_element(By.CSS_SELECTOR, "._acap")
+    if login_button:
+        login_button.click()
+    else:
+        print(
+            "Issue with login button element on instagram.",
+            "Sending issue to the developer to get a fix on this issue.",
+        )
+    sleep(3)  # was 5
+
+
+username = ""
+while logged_in == False:
+    username, password = collect_user_login()  # collect user input
+    login_to_website(username, password)  # login to instagram
+    login_unsuccessful = True
+    try:
+        incorrect_login_message = browser.find_element(
+            By.XPATH, '//*[@id="slfErrorAlert"]'
+        )
+        login_unsuccessful = True
+    except NoSuchElementException:
+        login_unsuccessful = False
+
+    if login_unsuccessful:
+        print("Login was unsuccessful. Please try again.")
+        print()
+    else:
+        logged_in = True
+        print("Login Successful.")
+        print()
+    # sleep(10000)
+
 
 # GO TO THE ACCOUNT PAGE
-browser.get("https://www.instagram.com/" + str(your_username))
+sleep(4)
+browser.get("https://www.instagram.com/" + str(username))
 print("Opened account page")
-sleep(3.5)
+sleep(4)
 
 # BEGIN SCRAPING
 print("Scraping followers...")
@@ -171,9 +229,9 @@ print("-------------------")
 
 # add people who mutually follow you to a list and remove them from the other lists
 mutual_follow = list(set(list_of_followers) & set(list_of_following))
-list_mutual_follow = []
+list_of_mutual = []
 for i in mutual_follow:
-    list_mutual_follow.append(list_of_followers.pop(list_of_followers.index(i)))
+    list_of_mutual.append(list_of_followers.pop(list_of_followers.index(i)))
     list_of_following.remove(i)
 
 
@@ -187,24 +245,25 @@ def remove_verified_tag(listofpeople):
             listofpeople[index_of_person] = person[:tag_index]
 
 
-remove_verified_tag(list_mutual_follow)
+remove_verified_tag(list_of_mutual)
 remove_verified_tag(list_of_followers)
 remove_verified_tag(list_of_following)
 
 
 def list_people(listofpeople):  # list the people in the list
-    for i in listofpeople:
-        print(" - " + str(i))
+    for person in listofpeople:
+        # print(" - " + str(i))
+        print(str(person))
 
 
 # MUTUALLY FOLLOW
 print()
 print(
     "There are "
-    + str(len(list_mutual_follow))
+    + str(len(list_of_mutual))
     + " people who are mutual followers. These people are: "
 )
-list_people(list_mutual_follow)
+list_people(list_of_mutual)
 print()
 
 # FOLLOWERS YOU DON'T FOLLOW
@@ -224,3 +283,19 @@ print(
 )
 list_people(list_of_following)
 print()
+
+with open("results.csv", "w") as results_csv:
+    writer = csv.writer(results_csv)
+    i = 0
+    while list_of_mutual[i] or list_of_followers[i] or list_of_following[i]:
+        line_to_write = ""
+        if list_of_mutual[i]:
+            line_to_write += str(list_of_mutual[i])
+        line_to_write += ","
+        if list_of_followers[i]:
+            line_to_write += str(list_of_followers[i])
+        line_to_write += ","
+        if list_of_following[i]:
+            line_to_write += str(list_of_following[i])
+        i += 1
+        writer.writerow(line_to_write)
