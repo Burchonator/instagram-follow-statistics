@@ -6,9 +6,6 @@ from kivy.uix.button import Button
 
 from functions import check_valid_password_length, login_to_instagram
 
-username = ""
-password = ""
-
 
 class LoginScreen(GridLayout):
 
