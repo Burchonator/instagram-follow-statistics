@@ -1,3 +1,7 @@
+NOTE 7/11/23: I don't know whether this works anymore since I added the gui. Last time I made changes was mid this year. I'm uploading what I have made to add to my portfolio.
+
+I will improve this in the future.
+
 # instagram-follow-statistics
 
 This python script scrapes your profile's followers and following and then shows you who mutually follows you, who you don't follow back, and who doesn't follow you back.
@@ -19,15 +23,7 @@ This script works locally on you machine and only sends your Instagram login cre
 5. The bot exits the browser and a report is generated of who mutually follows you, who you don't follow back, and who doesn't follow you back.
 
 # Note: 
-- This is a baseline for you to use. Please credit this project if my code assists you with your work. 🙏
 - This program isn't perfect. The code can obviosuly be improved and works for my profile with roughly 200 following and followers.
 - Not recommended for large profiles over 10K followers/following because the code uses a for loop that requires the bot to click Key.END to scroll down the list of followers and following.
 - This code hasn't been tested throughly. Only on my profiles.
 - XPATHS may change as the instagram inteface changes which means you may need to modify the XPATHS to where the buttons and data is stored.
-
-This was a fun project I made to see who doesn't follow me back. Please credit this project if this code helps you with your work. 🙏
-
-Thanks,
-Mitch
-
-Created 9/5/23 in Australia
