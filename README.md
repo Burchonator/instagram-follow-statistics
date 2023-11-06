@@ -1,6 +1,6 @@
-NOTE 7/11/23: I don't know whether this works anymore since I added the gui. Last time I made changes was mid this year. I'm uploading what I have made to add to my portfolio.
+NOTE 7/11/23: I don't know whether this works anymore since I added the gui. The last time I made changes to this project was in June 2023. I made further changes since, however I'm setting what as already been pushed from private to public to add to my github portfolio.
 
-I will improve this in the future.
+I may improve this in the future.
 
 # instagram-follow-statistics
 
